@@ -52,3 +52,7 @@ const handler = async (req: NextRequest, res: NextResponse) => {
 }
 
 export { handler as GET, handler as POST }
+
+const testing = 'testing'
+
+let test = 'test'

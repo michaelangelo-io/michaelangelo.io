@@ -1,0 +1,48 @@
+---
+title: 'How to create a VSCode Extension and LSP in Rust'
+publishedAt: '2024-01-16'
+lastEditedAt: '2024-01-16'
+summary: "Helpful tips for creating a Language Server and VSCode extension in Rust."
+---
+
+I recently published a new Extension/LSP called <a target="_blank" href='https://github.com/michaelangeloio/does-it-throw'>Does it Throw?</a>. It's a simple tool that (sorta) mimics Java's unchecked exceptions but in JavaScript/Typescript land. It's written in Rust. 
+
+Here's a little gif of it in action:
+
+![Does it Throw?](https://github.com/michaelangeloio/does-it-throw/blob/main/assets/basic-throw.gif?raw=true)
+
+While I can brag all day about this extension, I'm writing this to help *you* make an extension/LSP you can brag about. (Did I mention mine is written in Rust?)
+
+## First, why write an extension in Rust?
+
+Rust + WASM = 🚀🚀🚀
+
+I'm a big fan of Rust. Not just because it's ***blazingly fast***, but because it's incredibly powerful for building tools. It's a language that allows you to write safe and performant native code, while also being a language with a stable ecosystem (I'm looking at you JavaScript).
+
+For this article, we'll be using Rust + WASM, however, these general principles should work for any language that can compile to WASM. You can use Go, C++, TreeSitter (which is written in C), etc.
+
+## OK, what the heck is an LSP?
+
+TLDR; The Language Server Protocol (LSP) is essentially a server that launches with your editor to process code. I highly recommend reading the <a target="_blank" href='https://microsoft.github.io/language-server-protocol/'>official docs</a> for more info.
+
+An overly simplified explanation:
+> You can think of your editor (NeoVim, VSCode, etc) as a *client*, and your LSP as a *server*. The client sends the code to the server for processing, and the server can send back the results. The server can also do other fancy things like request more information from the client or even send back code completion suggestions.
+
+Good context to remember:
+> `JSON-RPC`: LSP uses the JSON-RPC protocol for messaging, which allows asynchronous communication. Messages sent between the client and the server are encoded in JSON and follow the JSON-RPC specification.
+
+> `stdio`, `pipe`, `socket`: LSP can communicate over stdio, pipe, socket, and node-ipc. Make sure to read the <a target="_blank" href='https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#implementationConsiderations'>official docs</a> for more info.
+
+## WASM vs Binaries
+
+Remember I mentioned WASM? Well, we're going to use it to build our server.
+
+You can always ship static binaries for your server, but WASM is a great alternative. WASM allows you to achieve near-native performance without a complex shim to choose the right binary for the right platform. I recommend checking out Oso's <a target="_blank" href='https://www.osohq.com/post/building-vs-code-extension-with-rust-wasm-typescript'>article</a>: They have a great breakdown of the trade-offs! For the TLDR, here's some good bullets:
+
+- If you ship a binary for each platform, you'll need to maintain a complex shim to choose the right binary for the right platform.
+- Let's not forget about the build process and CI/CD and how complex that can get. (I'm looking at you, Windows)
+- WASM lets you ship a single binary that works on all platforms right next to your extension.
+
+
+## Getting Started
+
